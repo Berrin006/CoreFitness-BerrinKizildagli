@@ -15,6 +15,7 @@ public static class InfrastructureServiceCollectionRegistrationExtensions
 
         services.AddPersistence(configuration, env);
 
+
         return services;
     }
 }

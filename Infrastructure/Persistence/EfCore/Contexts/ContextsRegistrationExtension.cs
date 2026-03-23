@@ -18,18 +18,12 @@ public static class ContextsRegistrationExtension
 
         if (env.IsDevelopment())
         {
-            services.AddSingleton<SqliteConnection>(_ =>
+            services.AddDbContext<DataContext>(options =>
             {
-                var conn = new SqliteConnection("Data Source=:memory:;");
-                conn.Open();
+                var conn = configuration.GetConnectionString("DefaultConnection")
+                    ?? throw new InvalidOperationException("DefaultConnection not found.");
 
-                return conn;
-            });
-
-            services.AddDbContext<DataContext>((sp, options) =>
-            {
-                var conn = sp.GetRequiredService<SqliteConnection>();
-                options.UseSqlite(conn);
+                options.UseSqlServer(conn);
             });
         }
         else
