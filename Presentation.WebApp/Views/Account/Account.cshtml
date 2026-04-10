@@ -1,0 +1,138 @@
+﻿@model Presentation.WebApp.Models.Account.AccountDetailsViewModel
+@using Infrastructure.Identity
+@using Infrastructure.Data
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "My Account";
+}
+
+<div class="account-page-wrapper" style="background-color: #F8F9FB; padding-bottom: 80px;">
+    
+    <section id="account-details" class="container pt-5">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert shadow-sm border-0 mb-4" style="background-color: #D6EB31; color: #000; border-radius: 15px; padding: 15px 25px; font-weight: 700;">
+                <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <div class="text-center mb-5">
+            <h1 style="font-weight: 800; font-size: 2.5rem; color: #000;">My Account</h1>
+        </div>
+
+        <div class="row g-4">
+            @* VÄNSTER KOLUMN (Profil + Meny) *@
+            <div class="col-lg-4">
+                <div class="d-flex flex-column" style="gap: 1.5rem;">
+                    
+                    @* PROFILBILD *@
+                    <div class="shadow-sm border-0 overflow-hidden" style="border-radius: 20px; background: #fff;">
+                        <img src="~/images/trainer-1 1.png" alt="Profile" class="w-100" style="object-fit: cover; max-height: 400px; display: block;" />
+                    </div>
+
+                    @* MENY BOX (Här är fixen) *@
+                    <div class="shadow-sm border-0 bg-white overflow-hidden" style="border-radius: 20px;">
+                        <div class="menu-header" style="background-color: #D6EB31; padding: 15px 20px; font-weight: 800; color: #000; text-transform: uppercase; font-size: 0.85rem;">
+                            Menu Options
+                        </div>
+            
+                        <div class="list-group list-group-flush">
+                            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 px-4 border-0 border-bottom">
+                                <span style="font-weight: 600;">About Me</span>
+                                <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.7rem;"></i>
+                            </a>
+
+                            <a asp-controller="Account" asp-action="SetPassword" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 px-4 border-0 border-bottom">
+                                <span style="font-weight: 600;">Change Password</span>
+                                <i class="fa-solid fa-key text-muted" style="font-size: 0.8rem;"></i>
+                            </a>
+
+                            <a asp-controller="Memberships" asp-action="Index" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 px-4 border-0 border-bottom">
+                                <span style="font-weight: 600;">My Membership</span>
+                                <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.7rem;"></i>
+                            </a>
+
+                            <a asp-controller="GymClasses" asp-action="MyBookings" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 px-4 border-0 border-bottom">
+                                <span style="font-weight: 600;">My Bookings</span>
+                                <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.7rem;"></i>
+                            </a>
+
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="list-group-item list-group-item-action w-100 text-start d-flex justify-content-between align-items-center py-3 px-4 border-0">
+                                    <span style="font-weight: 600;">Sign Out</span>
+                                    <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.7rem;"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+        
+                    @* REMOVE ACCOUNT *@
+                    <div class="text-center">
+                        <p class="mb-1" style="font-size: 0.85rem; color: #666;">If you like to cancel your account click below</p>
+                        <form asp-controller="Account" asp-action="DeleteAccount" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" style="color: #FF4D4D; font-weight: 700; text-decoration: underline; background: none; border: none; padding: 0; cursor: pointer;">Remove Account</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            @* HÖGER KOLUMN (Formulär + Stats) *@
+            <div class="col-lg-8">
+                @* ABOUT ME *@
+                <div class="bg-white p-4 p-md-5 shadow-sm mb-4" style="border-radius: 20px;">
+                    <h2 class="mb-4" style="font-weight: 800; font-size: 1.8rem;">About Me</h2>
+                    <form asp-controller="Account" asp-action="UpdateDetails" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label-custom">First Name</label>
+                            <input asp-for="FirstName" class="form-control form-input-custom" placeholder="Enter First Name" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label-custom">Last Name</label>
+                            <input asp-for="LastName" class="form-control form-input-custom" placeholder="Enter Last Name" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label-custom">Email Address <small class="text-muted">(Read only)</small></label>
+                            <input asp-for="Email" class="form-control form-input-custom" readonly />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label-custom">Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control form-input-custom" placeholder="Enter Phone Number" />
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn-save-custom">
+                                Save Changes <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                @* STATISTICS *@
+                <div class="bg-white p-4 p-md-5 shadow-sm" style="border-radius: 20px;">
+                    <h2 class="mb-4" style="font-weight: 800; font-size: 1.8rem;">My Statistics</h2>
+                    @* Progress bars... *@
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between fw-bold mb-2"><span>Check-in (last 30 days)</span><span>25</span></div>
+                        <div class="progress" style="height: 8px;"><div class="progress-bar" style="width: 85%; background-color: #D6EB31;"></div></div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between fw-bold mb-2"><span>Weight Goal</span><span>50%</span></div>
+                        <div class="progress" style="height: 8px;"><div class="progress-bar" style="width: 50%; background-color: #D6EB31;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="page__home">
+    <div class="container">
+        <partial name="Partials/Common/_FooterSection" />
+    </div>
+</div>

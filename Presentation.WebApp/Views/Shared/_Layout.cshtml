@@ -1,6 +1,18 @@
-﻿@{
-    var pageTitle = !string.IsNullOrWhiteSpace(ViewData["Title"]?.ToString())
-            ? $"{ViewData["Title"]} | CoreFitness" : "CoreFitness | Gym and Fitness";
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Presentation.WebApp
+@using Presentation.WebApp.Models
+@using Presentation.WebApp.Services
+@using Presentation.WebApp.Services.MenuNavigation
+@inject IMenuNavigationService MenuNavigationService
+@using Infrastructure.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    var title = ViewData["Title"] as string;
+    var pageTitle = !string.IsNullOrWhiteSpace(title)
+        ? $"{title} | CoreFitness"
+        : "CoreFitness | Gym and Fitness";
 }
 
 <!DOCTYPE html>
@@ -9,29 +21,128 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@pageTitle</title>
-    <script type="importmap"></script>
+
     <script src="https://kit.fontawesome.com/55d9285a26.js" crossorigin="anonymous"></script>
-    <link rel="shortcut icon" href="/favicon.ico" asp-append-version="true" />
+    <link rel="shortcut icon" href="~/favicon.ico" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/fonts.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
-    <div class="app-layout">
-        <header>
-            <partial name="Partials/_HeaderSection" />
+<body class="app-layout">
 
-            @if (IsSectionDefined("Hero"))
-                @RenderSection("Hero", required: false) 
+    @* --- MÖRK TOPP (Header + Hero) --- *@
+    <div class="bg-dark-section">
+        <header>
+            <div class="container">
+                <section class="section__header">
+                    <div class="logo">
+                        <a asp-controller="Home" asp-action="Index">
+                            <img src="~/images/logotype.png" alt="CoreFitness Logo" asp-append-version="true" />
+                        </a>
+                    </div>
+
+                    <nav class="main-menu">
+                        <ul class="menu">
+                            <li class="menu-item"><a asp-controller="FitnessCenters" asp-action="Index" class="menu-item-link">Fitness Centers</a></li>
+                            <li class="menu-item"><a asp-controller="Memberships" asp-action="Index" class="menu-item-link">Memberships</a></li>
+                            <li class="menu-item dropdown">
+                                <a href="#" class="menu-item-link">Training <i class="fa-solid fa-chevron-down" style="font-size: 0.8em;"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li><a asp-controller="Training" asp-action="PersonalTraining">Personal Training</a></li>
+                                    <li><a asp-controller="Training" asp-action="GroupTraining">Group Training</a></li>
+                                    <li><a asp-controller="Training" asp-action="OnlineCoaching">Online Coaching</a></li>
+                                </ul>
+                            </li>
+                            <li class="menu-item"><a asp-controller="CustomerService" asp-action="Index" class="menu-item-link">Customer Service</a></li>
+                            <li class="menu-item"><a asp-controller="Home" asp-action="Store" class="menu-item-link">Store</a></li>
+                        </ul>
+                    </nav>
+
+                    <div class="account-menu">
+                        @if (User.Identity!.IsAuthenticated)
+                        {
+                            <a asp-controller="Account" asp-action="Account" class="btn-signin">
+                                <i class="fa-solid fa-user"></i> My Account
+                            </a>
+        
+                            <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-become-member-text" style="border:none; background:none; cursor:pointer;">Logout</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-controller="Account" asp-action="Register" class="btn-become-member-text">Become Member</a>
+
+                            <a asp-controller="Account" asp-action="Login" class="btn-signin">
+                                Sign In <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        }
+    
+                        <button class="mobile-btn mobile-nav-toggle" data-mobile-nav-open>
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                    </div>
+                </section>
+            </div>
         </header>
-        <main>
-            @RenderBody()
-        </main>
-        <footer>
-            <partial name="Partials/_FooterSection" />
-        </footer>
+
+        @if (IsSectionDefined("Hero"))
+        {
+            @RenderSection("Hero")
+        }
     </div>
 
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <main role="main">
+        @RenderBody()
+    </main>
 
+    <div class="mobile-flyout-menu" id="mobileMenu" aria-hidden="true">
+        <div class="mobile-nav-wrapper">
+            <button class="close-btn" aria-label="Close Menu" data-mobile-nav-close>&times;</button>
+            <nav class="mobile-nav-content">
+                <div class="mobile-menu-group">
+                    <button class="mobile-menu-group-toggle" aria-expanded="false">
+                        Training <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <ul class="mobile-submenu">
+                        <li><a asp-controller="Training" asp-action="PersonalTraining">Personal Training</a></li>
+                        <li><a asp-controller="Training" asp-action="GroupTraining">Group Training</a></li>
+                        <li><a asp-controller="Training" asp-action="OnlineCoaching">Online Coaching</a></li>
+                    </ul>
+                </div>
+                <a asp-controller="FitnessCenters" asp-action="Index">Fitness Centers</a>
+                <a asp-controller="Memberships" asp-action="Index">Memberships</a>
+                <a asp-controller="CustomerService" asp-action="Index">Customer Service</a>
+                <a asp-controller="Home" asp-action="Store">Store</a>
+                <hr />
+                @if (User.Identity!.IsAuthenticated)
+                {
+                    <a asp-controller="Account" asp-action="Account">My Account</a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login">Sign In</a>
+                }
+            </nav>
+        </div>
+    </div>
+
+    @* --- FOOTER --- *@
+    <footer>
+        <div class="container">
+            @if (IsSectionDefined("Footer"))
+            {
+                @RenderSection("Footer")
+            }
+            else
+            {
+                <p>&copy; @DateTime.Now.Year - CoreFitness. All rights reserved.</p>
+            }
+        </div>
+    </footer>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

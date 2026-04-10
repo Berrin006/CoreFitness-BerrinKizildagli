@@ -4,18 +4,29 @@ using Domain.Aggregates.Memberships;
 
 namespace Application.Services;
 
-public class MembershipService(IMembershipRepository membershipRepository) : IMembershipService
+public class MembershipService : IMembershipService
 {
-    public async Task<Result<bool>> CreateMembershipAsync(string userId, string planName)
-    {
-        try
-        {
-            var existing = await membershipRepository.GetByUserIdAsync(userId);
-            if (existing != null && existing.IsActive)
-            {
-                return Result<bool>.Conflict("Du har redan ett aktivt medlemskap.");
-            }
+    private readonly IMembershipRepository _repository;
 
+    public MembershipService(IMembershipRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<bool> CreateMembershipAsync(string userId, string planName)
+    {
+        var existingMembership = await _repository.GetByUserIdAsync(userId);
+
+        if (existingMembership != null)
+        {
+            existingMembership.PlanName = planName;
+            existingMembership.StartDate = DateTime.Now; 
+            existingMembership.IsActive = true;
+
+            await _repository.UpdateAsync(existingMembership);
+        }
+        else
+        {
             var membership = new Membership
             {
                 UserId = userId,
@@ -24,18 +35,25 @@ public class MembershipService(IMembershipRepository membershipRepository) : IMe
                 IsActive = true
             };
 
-            await membershipRepository.AddAsync(membership);
+            await _repository.AddAsync(membership);
+        }
 
-            return Result<bool>.Ok(true);
-        }
-        catch (Exception ex)
-        {
-            return Result<bool>.Error(ex.Message);
-        }
+        return true;
     }
 
-    public async Task<Membership?> GetUserMembershipAsync(string userId)
+    public async Task<Membership?> GetMembershipByUserIdAsync(string userId)
     {
-        return await membershipRepository.GetByUserIdAsync(userId);
+        return await _repository.GetByUserIdAsync(userId);
+    }
+
+    public async Task<bool> CancelMembershipAsync(string userId)
+    {
+        var membership = await _repository.GetByUserIdAsync(userId);
+        if (membership == null) return false;
+
+        
+        await _repository.DeleteAsync(membership);
+
+        return true;
     }
 }

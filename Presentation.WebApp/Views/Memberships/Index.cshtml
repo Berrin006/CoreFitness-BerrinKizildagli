@@ -1,44 +1,154 @@
 ﻿@model Domain.Aggregates.Memberships.Membership
+@using Infrastructure.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
 
-<section class="container mt-5">
-    <h1>Our Memberships</h1>
+<section id="membership-page-v2" class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Our Membership Offers</h1>
+    </div>
 
-    @if (Model != null && Model.IsActive)
+    @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-info">
-            <h3>Your current membership</h3>
-            <p>Plan: <strong>@Model.PlanName</strong></p>
-            <p>Start Date: @Model.StartDate.ToShortDateString()</p>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-    else
-    {
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Monthly Pass</h5>
-                        <p class="card-text">399 kr / month</p>
-                        <form asp-action="Subscribe" method="post">
-                            <input type="hidden" name="planName" value="Monthly" />
-                            <button type="submit" class="primary-button">Select Monthly</button>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 align-items-stretch justify-content-center">
+        @* SILVER PLAN *@
+        <div class="col">
+            <div class="gym-card h-100 @(Model?.PlanName == "Silver" ? "ring-active" : "")">
+                <div class="card-body p-4 text-center d-flex flex-column">
+                    <div class="mb-3">
+                        <div class="icon-circle mx-auto"><i class="fa-solid fa-dumbbell"></i></div>
+                    </div>
+                    <h3 class="fw-bold">Standard Membership</h3>
+                    <p class="text-muted small">With the Standard Membership, get access to our full range of gym facilities.</p>
+
+                    <div class="price my-4">
+                        <span class="display-5 fw-bold">495.00</span> <span class="fs-6 text-muted">/month</span>
+                        <p class="text-muted small mb-0">* Monthly 20 Classes</p>
+                    </div>
+
+                    <ul class="list-unstyled mb-5 text-start border-top pt-3">
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-primary me-2"></i> Standard Locker</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-primary me-2"></i> High-energy group fitness classes</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-primary me-2"></i> Motivating & supportive environment</li>
+                    </ul>
+
+                    <div class="mt-auto">
+                        <form asp-controller="Memberships" asp-action="Subscribe" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="planName" value="Silver" />
+                            <button type="submit" class="btn-signin w-100 @(Model?.PlanName == "Silver" ? "disabled" : "")" @(Model?.PlanName == "Silver" ? "disabled" : "")>
+                                @(Model?.PlanName == "Silver" ? "Current Plan" : "Join Now") <i class="fa-solid fa-chevron-right ms-2"></i>
+                            </button>
                         </form>
+                        <p class="small text-muted mt-2">Try Any Membership For 1 Week</p>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-md-4">
-                <div class="card text-center border-primary">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">Annual Pass</h5>
-                        <p class="card-text">3499 kr / year</p>
-                        <form asp-action="Subscribe" method="post">
-                            <input type="hidden" name="planName" value="Annual" />
-                            <button type="submit" class="primary-button">Select Annual</button>
+        @* GOLD PLAN *@
+        <div class="col">
+            <div class="gym-card dark-card h-100 @(Model?.PlanName == "Guld" ? "ring-active-gold" : "")">
+                <div class="card-body p-4 text-center text-white d-flex flex-column">
+                    <div class="mb-3">
+                        <div class="icon-circle mx-auto"><i class="fa-solid fa-crown"></i></div>
+                    </div>
+                    <h3 class="fw-bold text-white">Premium Membership</h3>
+                    <p class="text-white-50 small">With the Premium Membership, get access to our full range of gym facilities.</p>
+
+                    <div class="price my-4">
+                        <span class="display-5 fw-bold text-primary">595.00</span> <span class="fs-6 text-white-50">/month</span>
+                        <p class="text-white-50 small mb-0">* Monthly 20 Classes</p>
+                    </div>
+
+                    <ul class="list-unstyled mb-5 text-start border-top border-secondary pt-3">
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-primary me-2"></i> Priority Support & Premium Locker</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-primary me-2"></i> High-energy group fitness classes</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-primary me-2"></i> Motivating & supportive environment</li>
+                    </ul>
+
+                    <div class="mt-auto">
+                        <form asp-controller="Memberships" asp-action="Subscribe" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="planName" value="Guld" />
+                            <button type="submit" class="btn-signin w-100 @(Model?.PlanName == "Guld" ? "disabled" : "")" @(Model?.PlanName == "Guld" ? "disabled" : "")>
+                                @(Model?.PlanName == "Guld" ? "Current Plan" : "Join Now") <i class="fa-solid fa-chevron-right ms-2"></i>
+                            </button>
                         </form>
+                        <p class="small text-white-50 mt-2">Try Any Membership For 1 Week</p>
                     </div>
                 </div>
             </div>
         </div>
-    }
-</section>
+
+        @* CONTACT PANEL *@
+        <div class="col">
+            <div class="footer-dark-panel p-4 h-100 d-flex flex-column text-center text-white">
+                <h4 class="text-primary fw-bold mt-2">Get Your Membership</h4>
+                <p class="small text-white-50 mb-4">Our memberships give you access to all equipment, personalized training.</p>
+
+                <div class="bg-dark-inner p-3 rounded mb-4 border border-secondary">
+                    <p class="text-white mb-2 small">Call Us At: <strong>+(46) 8 410 521 00</strong></p>
+                    <a href="tel:+46841052100" class="btn-signin w-100 text-decoration-none justify-content-center">
+                        Call Us Today! <i class="fa-solid fa-phone ms-2"></i>
+                    </a>
+                </div>
+
+                <div class="mt-auto">
+                    <img src="~/images/membership-image.png" class="img-fluid rounded shadow" alt="Member training">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center g-3 border-top pt-5 mt-5">
+            <div class="col-md-4"><p class="fw-bold"><i class="fa-regular fa-square-check text-primary me-2"></i> Get 30 day free trial</p></div>
+            <div class="col-md-4"><p class="fw-bold"><i class="fa-regular fa-square-check text-primary me-2"></i> No any hidden fees pay</p></div>
+            <div class="col-md-4"><p class="fw-bold"><i class="fa-regular fa-square-check text-primary me-2"></i> You can cancel anytime</p></div>
+        </div>
+
+        @* FAQ SECTION *@
+        <div class="cs-card mt-5 mb-5">
+            <div class="cs-grid">
+                <div class="cs-image-container">
+                    <img src="~/images/faqs-image 1.png" alt="FAQ" class="cs-main-img" />
+                </div>
+                <div class="cs-content-container">
+                    <span class="section-badge">Frequently Asked Questions</span>
+                    <h2 class="h2 mt-2">Common questions about gym and training</h2>
+
+                    <div class="faq-list mt-4">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Q1. Do I need prior gym experience to join CoreFitness?</span>
+                                <div class="faq-toggle-icon active-icon"><i class="fa-solid fa-chevron-up"></i></div>
+                            </div>
+                            <div class="faq-answer show">
+                                <p>No, gym is designed for all fitness levels. Our trainers guide beginners with proper techniques and structured workout plans to help them start safely and confidently.</p>
+                                <ul class="faq-bullets">
+                                    <li>Every new member receives a personalized introduction to equipments.</li>
+                                    <li>Workouts are designed to grow with you, ensuring beginners can start safely.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="faq-item"><div class="faq-question"><span>Q2. What facilities are included with the membership?</span><div class="faq-toggle-icon"><i class="fa-solid fa-chevron-down"></i></div></div></div>
+                        <div class="faq-item"><div class="faq-question"><span>Q3. Can I try the gym before taking a membership?</span><div class="faq-toggle-icon"><i class="fa-solid fa-chevron-down"></i></div></div></div>
+                        <div class="faq-item"><div class="faq-question"><span>Q4. Are there group workout programs available?</span><div class="faq-toggle-icon"><i class="fa-solid fa-chevron-down"></i></div></div></div>
+                        <div class="faq-item"><div class="faq-question"><span>Q5. Is nutrition guidance included in the plans?</span><div class="faq-toggle-icon"><i class="fa-solid fa-chevron-down"></i></div></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="page__home">
+        <div class="container">
+            <partial name="Partials/Common/_FooterSection" />
+        </div>
+    </div>

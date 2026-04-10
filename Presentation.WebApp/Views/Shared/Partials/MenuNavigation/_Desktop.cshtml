@@ -1,4 +1,11 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject Presentation.WebApp.Services.MenuNavigation.IMenuNavigationService MenuNavigationService
+@using Infrastructure.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
     var menu = MenuNavigationService.GetMenu();
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
@@ -29,7 +36,7 @@
         {
             <div class="menu-item dropdown @(isDropdownActive ? "active" : "")">
                 <span class="dropdown-trigger">
-                    @item.DisplayName
+                    @item.DisplayName <i class="fa-solid fa-chevron-down" style="font-size: 0.8em; margin-left: 5px;"></i>
                 </span>
 
                 <div class="dropdown-menu">

@@ -1,0 +1,10 @@
+﻿@using Infrastructure.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@if (!string.IsNullOrWhiteSpace(ViewData["Title"]?.ToString()))
+{
+    <section class="page-title">
+        <h1>@ViewData["Title"]?.ToString()</h1>
+    </section>
+}

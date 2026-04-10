@@ -1,6 +1,7 @@
 ﻿using Domain.Abstractions.Repositories;
 using Domain.Aggregates.GymClasses;
 using Infrastructure.Persistence.EfCore.Entities;
+using Infrastructure.Persistence.EfCore.Contexts;
 
 namespace Infrastructure.Persistence.EfCore.Repositories;
 

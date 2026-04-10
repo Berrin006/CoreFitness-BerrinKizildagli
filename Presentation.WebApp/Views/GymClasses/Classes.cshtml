@@ -1,0 +1,112 @@
+﻿@model IEnumerable<Domain.Aggregates.GymClasses.GymClass>
+
+@{
+    var isMyBookings = ViewData["IsMyBookingsPage"] as bool? ?? false;
+    ViewData["Title"] = isMyBookings ? "My Bookings" : "Available Classes";
+}
+
+<section class="container mt-5" style="position: relative; z-index: 5;">
+    <div class="mb-5">
+        <span class="section-title">@(isMyBookings ? "Account" : "Schedule")</span>
+        <h1 class="account-title">@(isMyBookings ? "My Booked Classes" : "Available Classes")</h1>
+    </div>
+
+    @* 1. ADMIN-KNAPP: Syns bara för Admin på schemasidan *@
+    @if (!isMyBookings && (User.IsInRole("Admin") || User.IsInRole("admin")))
+    {
+        <div class="mb-4">
+            <a asp-action="Create" class="btn shadow-sm" style="background-color: var(--theme-color); color: black; font-weight: bold; border-radius: 10px; padding: 12px 25px;">
+                <i class="fa-solid fa-plus me-2"></i> Add New Gym Class
+            </a>
+        </div>
+    }
+
+    @* 2. MEDDELANDEN: Framgång eller fel *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm mb-4" style="border-radius: 15px;">
+            <i class="fa-solid fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius: 15px;">
+            <i class="fa-solid fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="account-card p-5 text-center shadow-sm border-0">
+            <i class="fa-solid fa-calendar-xmark fa-3x mb-3 text-muted"></i>
+            <h3>No classes found</h3>
+            @if (isMyBookings)
+            {
+                <p>You haven't booked any classes yet.</p>
+                <a asp-action="Classes" class="btn btn-primary">Go to Schedule</a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card-grid">
+            @foreach (var item in Model)
+            {
+                var bookedClassIds = ViewData["BookedClassIds"] as List<string> ?? new List<string>();
+                var isBooked = bookedClassIds.Contains(item.Id);
+
+                <div class="gym-card shadow-sm h-100 d-flex flex-column" style="position: relative;">
+                    
+                    @* 3. DELETE-KNAPP: Bara för Admin *@
+                    @if (!isMyBookings && (User.IsInRole("Admin") || User.IsInRole("admin")))
+                    {
+                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="position: absolute; top: 10px; right: 10px;" onsubmit="return confirm('Are you sure?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    }
+
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h3>@item.Name</h3>
+                        @if (isBooked)
+                        {
+                            <span class="badge bg-success" style="border-radius: 10px; padding: 5px 10px;">Booked</span>
+                        }
+                    </div>
+
+                    <p><strong>Instructor:</strong> @item.Instructor</p>
+                    <div class="price mt-auto" style="font-size: 1.5rem; color: var(--theme-color);">
+                        @item.StartTime.ToString("HH:mm")
+                    </div>
+                    <p class="small text-muted">@item.StartTime.ToString("dd MMM, yyyy")</p>
+
+                    <div class="mt-4">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            @if (isBooked)
+                            {
+                                <form asp-action="Unbook" asp-route-id="@item.Id" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-danger w-100">Cancel Booking</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="Book" asp-route-id="@item.Id" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-primary w-100" style="background-color: var(--theme-color); color: black;">Book Now</button>
+                                </form>
+                            }
+                        }
+                        else
+                        {
+                            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-secondary w-100">Login to Book</a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</section>

@@ -1,31 +1,65 @@
 ﻿@model LoginViewModel
+@using Infrastructure.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Sign In";
 }
 
-<section class="login-section">
-    <div class="container">
-        <h1>Login</h1>
+<section class="login-section-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Welcome Back!</h1>
+            <p>Log in to continue your fitness journey with full access to your customized program and progress tracking.</p>
+        </div>
 
-        <form asp-action="Login" method="post" novalidate>
+        <div class="social-icons-container">
+            <div class="social-icons-row">
+                <form asp-action="ExternalLogin" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" name="provider" value="GitHub" class="social-icon-btn github-active-btn" title="Log in with GitHub">
+                        <i class="fa-brands fa-github"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="auth-divider">
+            <span>OR CONTINUE WITH</span>
+        </div>
+
+        <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" novalidate>
             @Html.AntiForgeryToken()
-
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <div class="form-group">
-                <label asp-for="Email"></label>
-                <input asp-for="Email" class="form-control" />
+            <div class="auth-form-group">
+                <label asp-for="Email">Email Address *</label>
+                <input asp-for="Email" class="auth-input" placeholder="Enter Email Address" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="Password"></label>
-                <input asp-for="Password" class="form-control" />
+            <div class="auth-form-group">
+                <div class="label-row">
+                    <label asp-for="Password">Password</label>
+                    <a asp-controller="Account" asp-action="SetPassword" class="forgot-pass-link">Forgot your password?</a>
+                </div>
+                <input asp-for="Password" type="password" class="auth-input" placeholder="Enter Password" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
-            <button type="submit" class="primary-button">Login</button>
-        </form>
-    </div>
-</section>
+            <button type="submit" class="auth-btn-primary">
+                Continue <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <div class="auth-terms">
+                <input type="checkbox" asp-for="RememberMe" id="terms">
+                    <label for="terms">Remember me</label>
+                </div>
+            </form>
+
+            <p class="auth-footer">
+                Don't have an account? <a asp-action="Register">Register here</a>
+            </p>
+        </div>
+    </section>

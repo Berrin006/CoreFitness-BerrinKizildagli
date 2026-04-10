@@ -1,6 +1,12 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Presentation.WebApp
+@using Presentation.WebApp.Models
 @using Presentation.WebApp.Services
 @using Presentation.WebApp.Services.MenuNavigation
-@inject IMenuNavigationService MenuNavigationService
 @using Presentation.WebApp.Models.Forms
 @using Presentation.WebApp.Models.Account
+@inject IMenuNavigationService MenuNavigationService
+@using Infrastructure.Identity
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager

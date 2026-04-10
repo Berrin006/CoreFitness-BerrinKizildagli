@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
+namespace Infrastructure.Persistence.EfCore.Contexts;
+
 public class DataContext(DbContextOptions<DataContext> options) : IdentityDbContext<IdentityUser>(options)
 {
     public DbSet<ContactRequestEntity> ContactRequests => Set<ContactRequestEntity>();

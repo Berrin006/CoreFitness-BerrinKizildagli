@@ -1,3 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Our Fitness Centers";
 }
+@using Infrastructure.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager

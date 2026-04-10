@@ -1,0 +1,46 @@
+﻿@using Infrastructure.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@section Hero {
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content-area">
+
+                <div class="hero-content">
+                    <h1 class="title">Ready to reach your goals?</h1>
+                    <p class="description">Join CoreFitness today and get access to world-class equipment and trainers.</p>
+                    <ul class="grid-checklist">
+                        <li>Personal Training</li>
+                        <li>Group Classes</li>
+                        <li>Modern Gym</li>
+                        <li>Open 24/7</li>
+                    </ul>
+                    <a href="/Memberships" class="btn btn-primary">Get Started</a>
+                </div>
+
+                <div class="hero-image-container">
+                    <div class="hero-image-bg-shape"></div>
+
+                    <img src="~/images/hero-image.png" class="hero-img" alt="Fitness Training" asp-append-version="true" />
+                </div>
+
+            </div>
+        </div>
+    </section>
+}
+
+
+<partial name="Partials/Sections/_BrandsSection" />
+
+<div class="container">
+    <partial name="Partials/Sections/_AboutUsSection" />
+    <partial name="Partials/Sections/_OurProgramsSection" />
+    <partial name="Partials/Sections/_OurStoreSection" />
+</div>
+
+<footer class="footer-section">
+    <div class="container">
+        <partial name="Partials/Common/_FooterSection" />
+    </div>
+</footer>

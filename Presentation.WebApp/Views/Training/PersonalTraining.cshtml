@@ -1,3 +1,11 @@
-﻿@{
-    ViewData["Title"] = "Personal Training";
+﻿@using Infrastructure.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@{
+    ViewData["Title"] = "Personal Training"; 
 }
+
+<partial name="Partials/Common/_PageTitleSection" />
+
+<div class="container">
+</div>

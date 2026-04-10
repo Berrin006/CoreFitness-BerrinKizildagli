@@ -1,99 +1,125 @@
 ﻿using Application.Services;
 using Domain.Aggregates.GymClasses;
-using Infrastructure.Persistence.EfCore.Contexts;
-using Infrastructure.Persistence.EfCore.Entities;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Presentation.WebApp.Attributes.MenuNavigation;
-using System.Security.Claims;
 
 namespace Presentation.WebApp.Controllers;
 
-public class GymClassesController(
-    IGymClassService gymClassService,
-    UserManager<IdentityUser> userManager,
-    DataContext context) : Controller
+public class GymClassesController(IGymClassService gymClassService, UserManager<ApplicationUser> userManager) : Controller
 {
-    private readonly DataContext _context = context;
-
-    [MenuItem(Title = "Gym Classes", Order = 2)]
     [HttpGet]
-    public async Task<IActionResult> Index()
+    [Route("classes")]
+    public async Task<IActionResult> Classes()
     {
-        var result = await gymClassService.GetAllAsync();
-        return View(result.Value ?? Enumerable.Empty<GymClass>());
+        var classesResult = await gymClassService.GetAllAsync();
+        var classes = classesResult.Value ?? new List<GymClass>();
+
+        if (User.Identity!.IsAuthenticated)
+        {
+            var userId = userManager.GetUserId(User);
+            var bookedIds = await gymClassService.GetBookedClassIdsForUserAsync(userId!);
+            ViewData["BookedClassIds"] = bookedIds ?? new List<string>();
+        }
+        else
+        {
+            ViewData["BookedClassIds"] = new List<string>();
+        }
+
+        return View(classes);
+    }
+
+    [Authorize]
+    [HttpGet]
+    [Route("account/bookings")]
+    public async Task<IActionResult> MyBookings()
+    {
+        var userId = userManager.GetUserId(User);
+        var bookedClasses = await gymClassService.GetBookedClassesForUserAsync(userId!);
+        var bookedIds = await gymClassService.GetBookedClassIdsForUserAsync(userId!);
+
+        ViewData["BookedClassIds"] = bookedIds ?? new List<string>();
+        ViewData["Title"] = "My Bookings";
+        ViewData["IsMyBookingsPage"] = true;
+
+        return View("Classes", bookedClasses ?? new List<GymClass>());
     }
 
     [Authorize]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Book(string id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(id)) return BadRequest();
+        var userId = userManager.GetUserId(User);
         var result = await gymClassService.BookClassAsync(userId!, id);
 
         if (!result.Success) TempData["ErrorMessage"] = result.ErrorMessage;
         else TempData["SuccessMessage"] = "Booking completed!";
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToLocalReferer();
     }
 
     [Authorize]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unbook(string id)
     {
+        if (string.IsNullOrEmpty(id)) return BadRequest();
         var userId = userManager.GetUserId(User);
-        if (string.IsNullOrEmpty(userId)) return Challenge();
+        var result = await gymClassService.UnbookClassAsync(userId!, id);
 
-        var result = await gymClassService.UnbookClassAsync(userId, id);
         if (result.Success) TempData["SuccessMessage"] = "Session cancelled!";
         else TempData["ErrorMessage"] = result.ErrorMessage;
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToLocalReferer();
     }
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin,admin")]
     [HttpGet]
-    public IActionResult Create()
-    {
-        return View();
-    }
+    public IActionResult Create() => View();
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin,admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(GymClass model)
     {
+        model.Id = Guid.NewGuid().ToString();
+        ModelState.Remove("Id");
+
         if (!ModelState.IsValid) return View(model);
 
-        var entity = new GymClassEntity
+        var result = await gymClassService.CreateClassAsync(model);
+        if (result.Success)
         {
-            Id = Guid.NewGuid().ToString(),
-            Name = model.Name,
-            Instructor = model.Instructor,
-            StartTime = model.StartTime
-        };
+            TempData["SuccessMessage"] = "Class created successfully!";
+            return RedirectToAction(nameof(Classes));
+        }
 
-        await _context.GymClasses.AddAsync(entity);
-        await _context.SaveChangesAsync();
-
-        TempData["SuccessMessage"] = "Class created successfully!";
-        return RedirectToAction(nameof(Index));
+        ModelState.AddModelError("", "Could not save to database.");
+        return View(model);
     }
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin,admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string id)
     {
-        var gymClass = await _context.GymClasses.FindAsync(id);
-        if (gymClass != null)
+        var result = await gymClassService.DeleteClassAsync(id);
+        if (result.Success) TempData["SuccessMessage"] = "Class deleted.";
+        else TempData["ErrorMessage"] = "Could not delete class.";
+
+        return RedirectToAction(nameof(Classes));
+    }
+
+    private IActionResult RedirectToLocalReferer()
+    {
+        var referer = Request.Headers["Referer"].ToString();
+        if (!string.IsNullOrEmpty(referer) && Url.IsLocalUrl(referer))
         {
-            _context.GymClasses.Remove(gymClass);
-            await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Class deleted.";
+            return Redirect(referer);
         }
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Classes));
     }
 }

@@ -1,4 +1,49 @@
-﻿@section Hero 
-{
-    <partial name="Partials/_HeroSection" />
+﻿@using Infrastructure.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@section Hero {
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content-area">
+
+                <div class="hero-content">
+                    <div class="title">
+                        <span class="section-title">Strong Body. Strong Mind</span>
+                        <h1>Build Strength Boost Confidence Today!</h1>
+                    </div>
+                    <div class="description">
+                        <p>
+                            Begin your fitness journey with expert trainers, modern equipment, and a
+                            supportive environment designed to help you build streangth and confidence.
+                        </p>
+                    </div>
+                    <ul class="grid-checklist">
+                        <li>Transform your body with training</li>
+                        <li>Build confidence through fitness</li>
+                        <li>Personel training for real results</li>
+                        <li>Fitness tailored to goals</li>
+                    </ul>
+                    <div class="cta-btn">
+                        <a href="/Memberships" class="btn btn-primary">Get Started</a>
+                    </div>
+                </div>
+
+                <div class="hero-image">
+                    <img src="/images/hero-image.png" class="hero-img" alt="Fitness Hero" />
+                </div>
+
+            </div>
+        </div>
+    </section>
 }
+
+<div class="page__home">
+    <div class="container">
+        <partial name="Partials/Sections/_BrandsSection" />
+        <partial name="Partials/Sections/_AboutUsSection" />
+        <partial name="Partials/Sections/_OurProgramsSection" />
+        <partial name="Partials/Sections/_OurStoreSection" />
+		<partial name="Partials/Common/_FooterSection" />
+    </div>
+</div>

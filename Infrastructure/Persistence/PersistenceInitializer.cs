@@ -1,4 +1,5 @@
-﻿using Infrastructure.Persistence.EfCore.Contexts;
+﻿using Infrastructure.Identity;
+using Infrastructure.Persistence.EfCore.Contexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ public static class PersistenceInitializer
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         
         if (env.IsDevelopment())
         {

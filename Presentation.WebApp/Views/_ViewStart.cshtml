@@ -1,3 +1,7 @@
-﻿@{
+﻿@using Infrastructure.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
     Layout = "_Layout";
 }

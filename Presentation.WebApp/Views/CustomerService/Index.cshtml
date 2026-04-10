@@ -1,49 +1,138 @@
 ﻿@model ContactForm
-
 @{
     ViewData["Title"] = "Customer Service";
 }
 
-<div>
-    @TempData["ContactFormMessage"]?.ToString()
-</div>
-
-<section class="contactform-section">
+<section class="customer-service-section">
     <div class="container">
-        <form class="contact-form" asp-controller="CustomerService" asp-action="Index" method="post" novalidate>
-            @Html.AntiForgeryToken()
+        <h1 class="page-main-title text-center">Customer Service</h1>
 
-            <div aria-label="firstname" class="form-group">
-                <label class="form-label" asp-for="FirstName"></label>
-                <input class="form-input" asp-for="FirstName" />
-                <span class="field-validation" asp-validation-for="FirstName"></span>
+        @if (TempData["ContactFormMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["ContactFormMessage"]
             </div>
+        }
 
-            <div aria-label="lastname" class="form-group">
-                <label class="form-label" asp-for="LastName"></label>
-                <input class="form-input" asp-for="LastName" />
-                <span class="field-validation" asp-validation-for="LastName"></span>
+        <div class="cs-card">
+            <div class="cs-grid">
+                <div class="cs-image-container">
+                    <img src="~/images/contact-us-image.png" alt="Contact Us" class="cs-main-img" />
+                    
+                    <div class="cs-info-overlay">
+                        <div class="info-box">
+                            <div class="icon-circle">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div class="info-text">
+                                <span class="label">Phone Number</span>
+                                <span class="value">+(46) 1 234 567 89</span>
+                            </div>
+                        </div>
+                        <div class="info-box">
+                            <div class="icon-circle">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+                            <div class="info-text">
+                                <span class="label">Email Address</span>
+                                <span class="value">info@corefitness.com</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cs-content-container">
+                    <h2 class="h3">Contact Us Today</h2>
+                    <p class="description">Ready to begin your fitness journey? Contact CoreFitness today and let our expert trainers guide you with the right program and support.</p>
+
+                    <form asp-controller="CustomerService" asp-action="Index" method="post" class="cs-form" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label asp-for="FirstName">First Name *</label>
+                                <input asp-for="FirstName" class="form-input" placeholder="Enter First Name" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="LastName">Last Name *</label>
+                                <input asp-for="LastName" class="form-input" placeholder="Enter Last Name" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label asp-for="Email">Email Address *</label>
+                                <input asp-for="Email" class="form-input" type="email" placeholder="Enter Email Address" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="PhoneNumber">Phone Number</label>
+                                <input asp-for="PhoneNumber" class="form-input" placeholder="Enter Phone Number" />
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label asp-for="Message">Message *</label>
+                            <textarea asp-for="Message" class="form-input" rows="4" placeholder="Message..."></textarea>
+                            <span asp-validation-for="Message" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn-submit">Submit Message <i class="fa-solid fa-chevron-right"></i></button>
+                    </form>
+                </div>
             </div>
+        </div>
 
-            <div aria-label="email" class="form-group">
-                <label class="form-label" asp-for="Email"></label>
-                <input class="form-input" asp-for="Email" />
-                <span class="field-validation" asp-validation-for="Email"></span>
+        <div class="cs-card mt-5 mb-5">
+            <div class="cs-grid">
+                <div class="cs-image-container">
+                    <img src="~/images/faqs-image 1.png" alt="FAQ" class="cs-main-img" />
+                </div>
+                <div class="cs-content-container">
+                    <span class="section-badge">Frequently Asked Questions</span>
+                    <h2 class="h2">Common questions about gym and training</h2>
+
+                    <div class="faq-list mt-4">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Q1. Do I need prior gym experience to join CoreFitness?</span>
+                                <div class="faq-toggle-icon"><i class="fa-solid fa-chevron-up"></i></div>
+                            </div>
+                            <div class="faq-answer">
+                                <p>No, CoreFitness is designed for all fitness levels. Our trainers guide beginners with proper techniques and structured workout plans to help them start safely and confidently.</p>
+                                <ul class="faq-bullets">
+                                    <li>Every new member receives a personalized introduction.</li>
+                                    <li>Workouts are designed to grow with you.</li>
+                                </ul>
+                            </div>
+                            <div class="faq-question">
+                                <span>Q2. What facilities are included with the membership?</span>
+                                <div class="faq-toggle-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                            </div>
+                            <div class="faq-question">
+                                <span>Q3. Can I try them gym before taking a membership?</span>
+                                <div class="faq-toggle-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                            </div>
+                            <div class="faq-question">
+                                <span>Q4. Are there group workout programs available?</span>
+                                <div class="faq-toggle-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                            </div>
+                            <div class="faq-question">
+                                <span>Q5. Is nutrition guidance included in the plans?</span>
+                                <div class="faq-toggle-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div aria-label="phone" class="form-group">
-                <label class="form-label" asp-for="PhoneNumber"></label>
-                <input class="form-input" asp-for="PhoneNumber" />
-                <span class="field-validation" asp-validation-for="PhoneNumber"></span>
-            </div>
-
-            <div aria-label="message" class="form-group">
-                <label class="form-label" asp-for="Message"></label>
-                <textarea class="form-input" asp-for="Message"></textarea>
-                <span class="field-validation" asp-validation-for="Message"></span>
-            </div>
-
-            <button aria-label="submit" class="primary-button" type="submit">Submit Message</button>
-        </form>
+        </div>
     </div>
 </section>
+
+<div class="page__home">
+    <div class="container">
+        <partial name="Partials/Common/_FooterSection" />
+    </div>
+</div>

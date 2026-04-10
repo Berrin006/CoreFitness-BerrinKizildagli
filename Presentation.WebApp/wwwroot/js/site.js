@@ -1,76 +1,91 @@
-﻿document.addEventListener("DOMContentLoaded", () => {
-    const selectors = {
-        toggleButton: ".mobile-nav-toggle",
-        flyoutMenu: ".mobile-flyout-menu",
-        closeButtons: "[data-mobile-nav-close]",
-        groupToggles: ".mobile-menu-group-toggle",
-        group: ".mobile-menu-group",
-        submenu: ".mobile-submenu"
-    };
-
-    const stateClasses = {
-        navOpen: "mobile-nav-open",
-        submenuOpen: "open"
-    };
-
+﻿document.addEventListener('DOMContentLoaded', function () {
+    // --- 1. Mobilmeny Element ---
+    const openBtn = document.querySelector('[data-mobile-nav-open]');
+    const closeBtn = document.querySelector('[data-mobile-nav-close]');
+    const flyout = document.querySelector('.mobile-flyout-menu');
     const body = document.body;
-    const toggleButton = document.querySelector(selectors.toggleButton);
-    const flyoutMenu = document.querySelector(selectors.flyoutMenu);
-    const closeButtons = document.querySelectorAll(selectors.closeButtons);
-    const groupToggles = document.querySelectorAll(selectors.groupToggles);
+    const toggles = document.querySelectorAll('.mobile-menu-group-toggle');
 
-    if (toggleButton && flyoutMenu) {
-        const isMenuOpen = () => body.classList.contains(stateClasses.navOpen);
+    // --- 2. Desktop Dropdown Element ---
+    const trainingToggle = document.querySelector('.main-menu .menu-item.dropdown > a');
+    const trainingItem = document.querySelector('.main-menu .menu-item.dropdown');
 
+    // --- Mobilmeny Logik ---
+    if (flyout) {
         const openMenu = () => {
-            body.classList.add(stateClasses.navOpen);
-            toggleButton.setAttribute("aria-expanded", "true");
-            flyoutMenu.setAttribute("aria-hidden", "false");
+            flyout.classList.add('is-open');
+            flyout.setAttribute('aria-hidden', 'false');
+            body.style.overflow = 'hidden';
         };
 
         const closeMenu = () => {
-            body.classList.remove(stateClasses.navOpen);
-            toggleButton.setAttribute("aria-expanded", "false");
-            flyoutMenu.setAttribute("aria-hidden", "true");
+            flyout.classList.remove('is-open');
+            flyout.setAttribute('aria-hidden', 'true');
+            body.style.overflow = '';
+
+            // Stäng alla öppna submenyer i mobilvyn när vi stänger huvudmenyn
+            toggles.forEach(t => {
+                t.setAttribute('aria-expanded', 'false');
+                if (t.nextElementSibling) t.nextElementSibling.style.maxHeight = null;
+            });
         };
 
-        const toggleMenu = () => {
-            if (isMenuOpen()) {
-                closeMenu();
-                return;
-            }
+        if (openBtn) openBtn.addEventListener('click', openMenu);
+        if (closeBtn) closeBtn.addEventListener('click', closeMenu);
 
-            openMenu();
-        };
-
-        const toggleSubmenu = (button) => {
-            const parent = button.closest(selectors.group);
-            const submenu = parent?.querySelector(selectors.submenu);
-
-            if (!parent || !submenu)
-                return;
-
-            const isExpanded = button.getAttribute("aria-expanded") === "true";
-            const nextExpandedState = (!isExpanded).toString();
-
-            button.setAttribute("aria-expanded", nextExpandedState);
-            submenu.classList.toggle(stateClasses.submenuOpen, !isExpanded);
-        };
-
-        toggleButton.addEventListener("click", toggleMenu);
-
-        closeButtons.forEach((button) => {
-            button.addEventListener("click", closeMenu);
+        // Stäng om man klickar på overlayen (bakgrunden)
+        flyout.addEventListener('click', (e) => {
+            if (e.target === flyout) closeMenu();
         });
 
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape" && isMenuOpen()) {
+        // Hantera dragspel/toggles i mobilmenyn
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', function () {
+                const submenu = this.nextElementSibling;
+                const isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+                // Stäng andra öppna flikar (Optional: ta bort loopen om du vill kunna öppna flera samtidigt)
+                toggles.forEach(other => {
+                    if (other !== this) {
+                        other.setAttribute('aria-expanded', 'false');
+                        if (other.nextElementSibling) other.nextElementSibling.style.maxHeight = null;
+                    }
+                });
+
+                // Växla nuvarande
+                if (!isExpanded) {
+                    this.setAttribute('aria-expanded', 'true');
+                    submenu.style.maxHeight = submenu.scrollHeight + "px";
+                } else {
+                    this.setAttribute('aria-expanded', 'false');
+                    submenu.style.maxHeight = null;
+                }
+            });
+        });
+
+        // Stäng mobilmenyn om fönstret blir stort
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1200 && flyout.classList.contains('is-open')) {
                 closeMenu();
             }
         });
+    }
 
-        groupToggles.forEach((button) => {
-            button.addEventListener("click", () => toggleSubmenu(button));
+    // --- Desktop Dropdown Logik ---
+    if (trainingToggle && trainingItem) {
+        trainingToggle.addEventListener('click', function (e) {
+            if (window.innerWidth >= 1200) {
+                e.preventDefault();
+                e.stopPropagation();
+                trainingItem.classList.toggle('active');
+            }
+        });
+
+        // Stäng desktop-menyn vid klick utanför
+        document.addEventListener('click', (e) => {
+            if (!trainingItem.contains(e.target)) {
+                trainingItem.classList.remove('active');
+            }
         });
     }
 });

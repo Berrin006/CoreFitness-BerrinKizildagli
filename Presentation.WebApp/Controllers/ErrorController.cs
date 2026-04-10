@@ -9,12 +9,6 @@ public class ErrorController : Controller
     {
         Response.StatusCode = statusCode;
 
-        return statusCode switch
-        {
-            401 => View("UnAuthorized"),
-            403 => View("Forbidden"),
-            404 => View("NotFound"),
-            _ => View("Error"),
-        };
+        return View("Error", statusCode);
     }
 }

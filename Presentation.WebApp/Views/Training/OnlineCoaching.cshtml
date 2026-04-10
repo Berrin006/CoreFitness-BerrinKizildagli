@@ -1,3 +1,5 @@
-﻿@{
-    ViewData["Title"] = "Online Coaching";
-}
+﻿@using Infrastructure.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+<partial name="Partials/Common/_PageTitleSection" />
