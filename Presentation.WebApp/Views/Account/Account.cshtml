@@ -23,16 +23,13 @@
         </div>
 
         <div class="row g-4">
-            @* VÄNSTER KOLUMN (Profil + Meny) *@
             <div class="col-lg-4">
                 <div class="d-flex flex-column" style="gap: 1.5rem;">
                     
-                    @* PROFILBILD *@
                     <div class="shadow-sm border-0 overflow-hidden" style="border-radius: 20px; background: #fff;">
                         <img src="~/images/trainer-1 1.png" alt="Profile" class="w-100" style="object-fit: cover; max-height: 400px; display: block;" />
                     </div>
 
-                    @* MENY BOX (Här är fixen) *@
                     <div class="shadow-sm border-0 bg-white overflow-hidden" style="border-radius: 20px;">
                         <div class="menu-header" style="background-color: #D6EB31; padding: 15px 20px; font-weight: 800; color: #000; text-transform: uppercase; font-size: 0.85rem;">
                             Menu Options
@@ -69,7 +66,6 @@
                         </div>
                     </div>
         
-                    @* REMOVE ACCOUNT *@
                     <div class="text-center">
                         <p class="mb-1" style="font-size: 0.85rem; color: #666;">If you like to cancel your account click below</p>
                         <form asp-controller="Account" asp-action="DeleteAccount" method="post">
@@ -80,9 +76,7 @@
                 </div>
             </div>
 
-            @* HÖGER KOLUMN (Formulär + Stats) *@
             <div class="col-lg-8">
-                @* ABOUT ME *@
                 <div class="bg-white p-4 p-md-5 shadow-sm mb-4" style="border-radius: 20px;">
                     <h2 class="mb-4" style="font-weight: 800; font-size: 1.8rem;">About Me</h2>
                     <form asp-controller="Account" asp-action="UpdateDetails" method="post">
@@ -113,10 +107,8 @@
                     </form>
                 </div>
 
-                @* STATISTICS *@
                 <div class="bg-white p-4 p-md-5 shadow-sm" style="border-radius: 20px;">
                     <h2 class="mb-4" style="font-weight: 800; font-size: 1.8rem;">My Statistics</h2>
-                    @* Progress bars... *@
                     <div class="mb-4">
                         <div class="d-flex justify-content-between fw-bold mb-2"><span>Check-in (last 30 days)</span><span>25</span></div>
                         <div class="progress" style="height: 8px;"><div class="progress-bar" style="width: 85%; background-color: #D6EB31;"></div></div>

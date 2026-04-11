@@ -10,8 +10,9 @@ public class SetPasswordViewModel
 
     [Required(ErrorMessage = "Password is required")]
     [DataType(DataType.Password)]
-    [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 8)]
-    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
-        ErrorMessage = "Password must contain uppercase, lowercase, number and special character.")]
+    [StringLength(100, ErrorMessage = "The password must be at least {2} characters long.", MinimumLength = 6)]
     public string Password { get; set; } = null!;
+
+    [Range(typeof(bool), "true", "true", ErrorMessage = "You must accept the terms.")]
+    public bool AcceptTerms { get; set; }
 }

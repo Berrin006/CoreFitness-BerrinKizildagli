@@ -1,11 +1,15 @@
 ﻿@using Infrastructure.Identity
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
+
 @{
-    ViewData["Title"] = "Personal Training"; 
+    ViewData["Title"] = "Personal Training";
 }
 
 <partial name="Partials/Common/_PageTitleSection" />
 
-<div class="container">
-</div>
+<section class="personal-training-wrapper" style="background-color: #ffffff; min-height: 50vh; padding: 100px 0;">
+    <div class="container text-center">
+        <p class="text-muted">Personal training sessions will soon be available for booking to help you reach your goals faster.</p>
+    </div>
+</section>

@@ -66,7 +66,6 @@ using (var scope = app.Services.CreateScope())
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-        // ROL İSMİ: "Admin" (Büyük harfle)
         string roleName = "Admin";
         if (!await roleManager.RoleExistsAsync(roleName))
         {

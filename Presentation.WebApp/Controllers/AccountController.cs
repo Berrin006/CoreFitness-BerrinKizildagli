@@ -88,7 +88,7 @@ public class AccountController(
             Email = model.Email,
             FirstName = model.Email.Split('@')[0],
             LastName = "User",
-            EmailConfirmed = true // Fixar problem med att man inte kan logga in direkt
+            EmailConfirmed = true 
         };
 
         var result = await userManager.CreateAsync(user, model.Password);
@@ -182,7 +182,8 @@ public class AccountController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SetPassword(SetPasswordViewModel model)
     {
-        if (!ModelState.IsValid) return View(model);
+        if (!ModelState.IsValid)
+            return View(model);
 
         var user = await userManager.FindByEmailAsync(model.Email);
         if (user == null)
@@ -191,13 +192,17 @@ public class AccountController(
             return View(model);
         }
 
-        // Force reset
-        await userManager.RemovePasswordAsync(user);
+        var hasPassword = await userManager.HasPasswordAsync(user);
+        if (hasPassword)
+        {
+            await userManager.RemovePasswordAsync(user);
+        }
+
         var result = await userManager.AddPasswordAsync(user, model.Password);
 
         if (result.Succeeded)
         {
-            TempData["SuccessMessage"] = "Password updated! Please log in.";
+            TempData["SuccessMessage"] = "Password has been set successfully! You can now log in.";
             return RedirectToAction("Login");
         }
 
